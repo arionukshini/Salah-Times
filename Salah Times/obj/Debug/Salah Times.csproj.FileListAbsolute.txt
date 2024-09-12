@@ -1,0 +1,17 @@
+E:\Other\Coding\Salah Times\Salah Times\bin\Debug\Salah Times.exe.config
+E:\Other\Coding\Salah Times\Salah Times\obj\Debug\Salah_Times.Home.resources
+E:\Other\Coding\Salah Times\Salah Times\obj\Debug\Salah_Times.Properties.Resources.resources
+E:\Other\Coding\Salah Times\Salah Times\obj\Debug\Salah Times.csproj.GenerateResource.Cache
+E:\Other\Coding\Salah Times\Salah Times\bin\Debug\Salah Times.exe
+E:\Other\Coding\Salah Times\Salah Times\bin\Debug\Salah Times.pdb
+E:\Other\Coding\Salah Times\Salah Times\obj\Debug\Salah Times.exe
+E:\Other\Coding\Salah Times\Salah Times\obj\Debug\Salah Times.pdb
+E:\Other\Coding\Salah Times\Salah Times\bin\Debug\EntityFramework.dll
+E:\Other\Coding\Salah Times\Salah Times\bin\Debug\EntityFramework.SqlServer.dll
+E:\Other\Coding\Salah Times\Salah Times\bin\Debug\System.Data.SQLite.dll
+E:\Other\Coding\Salah Times\Salah Times\bin\Debug\System.Data.SQLite.EF6.dll
+E:\Other\Coding\Salah Times\Salah Times\bin\Debug\System.Data.SQLite.Linq.dll
+E:\Other\Coding\Salah Times\Salah Times\bin\Debug\EntityFramework.xml
+E:\Other\Coding\Salah Times\Salah Times\bin\Debug\EntityFramework.SqlServer.xml
+E:\Other\Coding\Salah Times\Salah Times\bin\Debug\System.Data.SQLite.xml
+E:\Other\Coding\Salah Times\Salah Times\obj\Debug\Salah Times.csprojResolveAssemblyReference.cache

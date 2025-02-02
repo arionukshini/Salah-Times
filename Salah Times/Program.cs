@@ -10,7 +10,7 @@ namespace Salah_Times
         static void Main()
         {
             // Absolute path to your SQLite database file
-            string databasePath = @"E:\Other\Coding\Salah Times\takvimi.sqlite";
+            string databasePath = @"D:\Other\Coding\Salah Times\takvimi.sqlite";
             string connectionString = $"Data Source={databasePath};";
 
             Console.WriteLine($"Using database at: {databasePath}");

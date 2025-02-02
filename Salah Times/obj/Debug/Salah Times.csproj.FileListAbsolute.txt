@@ -15,3 +15,22 @@ E:\Other\Coding\Salah Times\Salah Times\bin\Debug\EntityFramework.xml
 E:\Other\Coding\Salah Times\Salah Times\bin\Debug\EntityFramework.SqlServer.xml
 E:\Other\Coding\Salah Times\Salah Times\bin\Debug\System.Data.SQLite.xml
 E:\Other\Coding\Salah Times\Salah Times\obj\Debug\Salah Times.csprojResolveAssemblyReference.cache
+D:\Other\Coding\Salah Times\Salah Times\bin\Debug\Salah Times.exe.config
+D:\Other\Coding\Salah Times\Salah Times\bin\Debug\Salah Times.exe
+D:\Other\Coding\Salah Times\Salah Times\bin\Debug\Salah Times.pdb
+D:\Other\Coding\Salah Times\Salah Times\bin\Debug\EntityFramework.dll
+D:\Other\Coding\Salah Times\Salah Times\bin\Debug\EntityFramework.SqlServer.dll
+D:\Other\Coding\Salah Times\Salah Times\bin\Debug\System.Data.SQLite.dll
+D:\Other\Coding\Salah Times\Salah Times\bin\Debug\System.Data.SQLite.EF6.dll
+D:\Other\Coding\Salah Times\Salah Times\bin\Debug\System.Data.SQLite.Linq.dll
+D:\Other\Coding\Salah Times\Salah Times\bin\Debug\EntityFramework.xml
+D:\Other\Coding\Salah Times\Salah Times\bin\Debug\EntityFramework.SqlServer.xml
+D:\Other\Coding\Salah Times\Salah Times\bin\Debug\System.Data.SQLite.xml
+D:\Other\Coding\Salah Times\Salah Times\obj\Debug\Salah Times.csproj.AssemblyReference.cache
+D:\Other\Coding\Salah Times\Salah Times\obj\Debug\Salah_Times.Home.resources
+D:\Other\Coding\Salah Times\Salah Times\obj\Debug\Salah_Times.Properties.Resources.resources
+D:\Other\Coding\Salah Times\Salah Times\obj\Debug\Salah Times.csproj.GenerateResource.cache
+D:\Other\Coding\Salah Times\Salah Times\obj\Debug\Salah Times.csproj.CoreCompileInputs.cache
+D:\Other\Coding\Salah Times\Salah Times\obj\Debug\Salah Ti.F076B338.Up2Date
+D:\Other\Coding\Salah Times\Salah Times\obj\Debug\Salah Times.exe
+D:\Other\Coding\Salah Times\Salah Times\obj\Debug\Salah Times.pdb

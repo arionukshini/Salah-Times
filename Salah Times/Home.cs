@@ -7,14 +7,18 @@ namespace Salah_Times
 {
     public partial class Home : Form
     {
-        private static readonly Color BackgroundTop = Color.FromArgb(8, 16, 28);
-        private static readonly Color BackgroundBottom = Color.FromArgb(3, 7, 13);
-        private static readonly Color PanelColor = Color.FromArgb(24, 34, 48);
+        private static readonly Color BackgroundColor = Color.FromArgb(3, 10, 18);
+        private static readonly Color PanelColor = Color.FromArgb(23, 36, 54);
         private static readonly Color PanelHoverColor = Color.FromArgb(30, 47, 68);
         private static readonly Color AccentBlue = Color.FromArgb(15, 135, 241);
         private static readonly Color SoftBlue = Color.FromArgb(104, 188, 255);
         private static readonly Color MainText = Color.White;
         private static readonly Color MutedText = Color.FromArgb(170, 186, 205);
+        private const int FocusedContentWidth = 720;
+        private const int FocusedContentHeight = 500;
+        private const int MaxPageHeight = 330;
+        private const int DesiredRowHeight = 52;
+        private const int RowGap = 10;
 
         private Timer timer;
         private DateTime nextPrayerTime;
@@ -47,18 +51,18 @@ namespace Salah_Times
         private void ApplyModernTheme()
         {
             DoubleBuffered = true;
-            BackColor = BackgroundBottom;
+            BackColor = BackgroundColor;
             ForeColor = MainText;
-            FormBorderStyle = FormBorderStyle.Sizable;
-            MaximizeBox = true;
+            FormBorderStyle = FormBorderStyle.FixedSingle;
+            MaximizeBox = false;
             MinimizeBox = true;
-            MinimumSize = new Size(760, 540);
-            MaximumSize = Size.Empty;
-            Size = new Size(860, 620);
+            ClientSize = new Size(920, 600);
+            MinimumSize = Size;
+            MaximumSize = Size;
 
             logo.SizeMode = PictureBoxSizeMode.Zoom;
             logo.BackColor = Color.Transparent;
-            logo.Size = new Size(56, 56);
+            logo.Size = new Size(52, 52);
 
             logoName.Font = new Font("Segoe UI Semibold", 28F, FontStyle.Bold, GraphicsUnit.Point);
             logoName.ForeColor = MainText;
@@ -72,15 +76,16 @@ namespace Salah_Times
                 BackColor = Color.Transparent,
                 ForeColor = SoftBlue,
                 Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point),
-                TextAlign = ContentAlignment.MiddleLeft
+                TextAlign = ContentAlignment.MiddleCenter
             };
             Controls.Add(countdownLabel);
 
             label1.Visible = false;
-            timeDiffTxt.Font = new Font("Segoe UI", 9.5F, FontStyle.Regular, GraphicsUnit.Point);
+            timeDiffTxt.Font = new Font("Segoe UI", 8.7F, FontStyle.Regular, GraphicsUnit.Point);
             timeDiffTxt.ForeColor = MutedText;
             timeDiffTxt.BackColor = Color.Transparent;
             timeDiffTxt.AutoSize = false;
+            timeDiffTxt.UseMnemonic = false;
 
             PrepareCustomTabs();
 
@@ -89,7 +94,7 @@ namespace Salah_Times
             Controls.Add(normalPage);
             Controls.Add(extraPage);
 
-            time10 = new Label { Text = "Midnight" };
+            time10 = new Label { Text = "Mesi i Nates" };
             clock10 = new Label { Text = "--:--" };
 
             CreatePrayerRows(
@@ -99,8 +104,8 @@ namespace Salah_Times
 
             CreatePrayerRows(
                 extraPage,
-                new[] { time6, time7, time8, time9, time10 },
-                new[] { clock6, clock7, clock8, clock9, clock10 });
+                new[] { time6, time7, time10, time8, time9 },
+                new[] { clock6, clock7, clock10, clock8, clock9 });
 
             Resize += (sender, args) => LayoutHome();
             ShowPage(normalPage);
@@ -115,7 +120,7 @@ namespace Salah_Times
 
             tabSwitchPanel = new Panel
             {
-                BackColor = BackgroundBottom
+                BackColor = BackgroundColor
             };
 
             namaziTabButton = CreateTabButton("Namazi");
@@ -135,7 +140,7 @@ namespace Salah_Times
             {
                 Text = text,
                 AccentColor = AccentBlue,
-                BackColor = BackgroundBottom,
+                BackColor = BackgroundColor,
                 Font = new Font("Segoe UI Semibold", 10F, FontStyle.Bold, GraphicsUnit.Point)
             };
         }
@@ -144,9 +149,9 @@ namespace Salah_Times
         {
             return new Panel
             {
-                BackColor = Color.FromArgb(10, 18, 31),
+                BackColor = BackgroundColor,
                 ForeColor = MainText,
-                Padding = new Padding(16),
+                Padding = new Padding(14),
                 Visible = false
             };
         }
@@ -189,7 +194,7 @@ namespace Salah_Times
             label.AutoSize = false;
             label.BackColor = Color.Transparent;
             label.ForeColor = MutedText;
-            label.Font = new Font("Segoe UI Semibold", 13F, FontStyle.Bold, GraphicsUnit.Point);
+            label.Font = new Font("Segoe UI Semibold", 12.5F, FontStyle.Bold, GraphicsUnit.Point);
             label.TextAlign = ContentAlignment.MiddleLeft;
         }
 
@@ -198,35 +203,43 @@ namespace Salah_Times
             label.AutoSize = false;
             label.BackColor = Color.Transparent;
             label.ForeColor = AccentBlue;
-            label.Font = new Font("Segoe UI", 18F, FontStyle.Bold, GraphicsUnit.Point);
+            label.Font = new Font("Segoe UI", 17F, FontStyle.Bold, GraphicsUnit.Point);
             label.TextAlign = ContentAlignment.MiddleRight;
         }
 
         private void LayoutHome()
         {
-            int contentWidth = Math.Max(320, Math.Min(760, ClientSize.Width - 72));
+            int contentWidth = Math.Max(320, Math.Min(FocusedContentWidth, ClientSize.Width - 80));
+            int contentHeight = Math.Max(430, Math.Min(FocusedContentHeight, ClientSize.Height - 54));
             int left = (ClientSize.Width - contentWidth) / 2;
-            int top = 28;
+            int top = Math.Max(22, (ClientSize.Height - contentHeight) / 2);
 
-            logo.Location = new Point(left, top + 2);
-            logoName.Location = new Point(left + 72, top - 2);
-            logoName.Size = new Size(contentWidth - 72, 44);
+            int headerWidth = Math.Min(390, contentWidth);
+            int headerLeft = left + (contentWidth - headerWidth) / 2;
 
-            countdownLabel.Location = new Point(left + 74, top + 42);
-            countdownLabel.Size = new Size(contentWidth - 74, 28);
+            logo.Location = new Point(headerLeft, top + 4);
+            logoName.Location = new Point(headerLeft + 66, top - 1);
+            logoName.Size = new Size(headerWidth - 66, 44);
 
-            tabSwitchPanel.Location = new Point(left, top + 88);
-            tabSwitchPanel.Size = new Size(Math.Min(308, contentWidth), 42);
+            countdownLabel.Location = new Point(left, top + 58);
+            countdownLabel.Size = new Size(contentWidth, 28);
+
+            int switchWidth = Math.Min(306, contentWidth);
+            tabSwitchPanel.Location = new Point(left + (contentWidth - switchWidth) / 2, top + 104);
+            tabSwitchPanel.Size = new Size(switchWidth, 40);
             LayoutTabSwitcher();
 
             int pageTop = tabSwitchPanel.Bottom + 14;
-            int pageHeight = Math.Max(256, ClientSize.Height - pageTop - 82);
+            int footerHeight = 44;
+            int footerTop = top + contentHeight - footerHeight;
+            int availablePageHeight = Math.Max(248, footerTop - pageTop - 14);
+            int pageHeight = Math.Min(MaxPageHeight, availablePageHeight);
             Rectangle pageBounds = new Rectangle(left, pageTop, contentWidth, pageHeight);
             normalPage.Bounds = pageBounds;
             extraPage.Bounds = pageBounds;
 
-            timeDiffTxt.Location = new Point(left, ClientSize.Height - 54);
-            timeDiffTxt.Size = new Size(contentWidth, 28);
+            timeDiffTxt.Location = new Point(left, footerTop);
+            timeDiffTxt.Size = new Size(contentWidth, footerHeight);
 
             LayoutPrayerRows(normalPage);
             LayoutPrayerRows(extraPage);
@@ -240,7 +253,7 @@ namespace Salah_Times
                 return;
             }
 
-            int gap = 8;
+            int gap = 10;
             int buttonWidth = (tabSwitchPanel.Width - gap) / 2;
             namaziTabButton.Bounds = new Rectangle(0, 0, buttonWidth, tabSwitchPanel.Height);
             extraTabButton.Bounds = new Rectangle(buttonWidth + gap, 0, buttonWidth, tabSwitchPanel.Height);
@@ -253,10 +266,12 @@ namespace Salah_Times
                 return;
             }
 
-            int gap = 9;
+            int gap = RowGap;
             int usableHeight = page.ClientSize.Height - page.Padding.Vertical;
-            int rowHeight = Math.Max(44, (usableHeight - gap * (page.Controls.Count - 1)) / page.Controls.Count);
-            int y = page.Padding.Top;
+            int maxRowHeight = (usableHeight - gap * (page.Controls.Count - 1)) / page.Controls.Count;
+            int rowHeight = Math.Max(42, Math.Min(DesiredRowHeight, maxRowHeight));
+            int totalRowsHeight = rowHeight * page.Controls.Count + gap * (page.Controls.Count - 1);
+            int y = page.Padding.Top + Math.Max(0, (usableHeight - totalRowsHeight) / 2);
 
             foreach (Control control in page.Controls)
             {
@@ -320,7 +335,9 @@ namespace Salah_Times
 
         protected override void OnPaint(PaintEventArgs e)
         {
-            using (LinearGradientBrush brush = new LinearGradientBrush(ClientRectangle, BackgroundTop, BackgroundBottom, 90F))
+            e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
+
+            using (SolidBrush brush = new SolidBrush(BackgroundColor))
             {
                 e.Graphics.FillRectangle(brush, ClientRectangle);
             }
@@ -541,7 +558,7 @@ namespace Salah_Times
         protected override void OnPaint(PaintEventArgs e)
         {
             e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
-            e.Graphics.Clear(Parent?.BackColor ?? Color.FromArgb(3, 7, 13));
+            e.Graphics.Clear(BackColor);
 
             Rectangle bounds = new Rectangle(0, 0, Width - 1, Height - 1);
             Color fill = IsSelected

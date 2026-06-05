@@ -1,27 +1,25 @@
-﻿using System;
+using System;
 using System.Data.SQLite;
+using System.IO;
 using System.Windows.Forms;
 
 namespace Salah_Times
 {
     static class Program
     {
+        private const string DatabaseFileName = "takvimi.sqlite";
+
         [STAThread]
         static void Main()
         {
-            // Absolute path to your SQLite database file
-            string databasePath = @"D:\Other\Coding\Salah Times\takvimi.sqlite";
-            string connectionString = $"Data Source={databasePath};";
-
-            Console.WriteLine($"Using database at: {databasePath}");
-
-            using (SQLiteConnection conn = new SQLiteConnection(connectionString))
+            try
             {
-                try
+                string databasePath = EnsureDatabaseExists();
+                string connectionString = $"Data Source={databasePath};Version=3;";
+
+                using (SQLiteConnection conn = new SQLiteConnection(connectionString))
                 {
-                    // Open the connection
                     conn.Open();
-                    Console.WriteLine("Connection to the database was successful.");
 
                     // Get today's date but change the year to 2016
                     DateTime today = DateTime.Now;
@@ -109,16 +107,72 @@ namespace Salah_Times
                             }
                             else
                             {
-                                Console.WriteLine("No data found for the given date.");
+                                MessageBox.Show(
+                                    "No prayer times were found for today's date.",
+                                    "Salah Times",
+                                    MessageBoxButtons.OK,
+                                    MessageBoxIcon.Warning);
                             }
                         }
                     }
                 }
-                catch (Exception ex)
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    "Could not load the prayer times database.\n\n" + ex.Message,
+                    "Salah Times",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
+        }
+
+        private static string EnsureDatabaseExists()
+        {
+            string appDataFolder = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "Salah Times");
+            string appDataDatabasePath = Path.Combine(appDataFolder, DatabaseFileName);
+
+            if (File.Exists(appDataDatabasePath))
+            {
+                return appDataDatabasePath;
+            }
+
+            Directory.CreateDirectory(appDataFolder);
+
+            string sourceDatabasePath = FindBundledDatabase();
+            if (sourceDatabasePath == null)
+            {
+                throw new FileNotFoundException(
+                    $"Could not find {DatabaseFileName}. Make sure it is included next to the program when building the exe.");
+            }
+
+            File.Copy(sourceDatabasePath, appDataDatabasePath);
+            return appDataDatabasePath;
+        }
+
+        private static string FindBundledDatabase()
+        {
+            string baseFolder = AppDomain.CurrentDomain.BaseDirectory;
+            string[] possiblePaths =
+            {
+                Path.Combine(baseFolder, DatabaseFileName),
+                Path.Combine(baseFolder, "..", DatabaseFileName),
+                Path.Combine(baseFolder, "..", "..", DatabaseFileName),
+                Path.Combine(baseFolder, "..", "..", "..", DatabaseFileName)
+            };
+
+            foreach (string possiblePath in possiblePaths)
+            {
+                string fullPath = Path.GetFullPath(possiblePath);
+                if (File.Exists(fullPath))
                 {
-                    Console.WriteLine("An error occurred: " + ex.Message);
+                    return fullPath;
                 }
             }
+
+            return null;
         }
     }
 }

@@ -34,3 +34,4 @@ D:\Other\Coding\Salah Times\Salah Times\obj\Debug\Salah Times.csproj.CoreCompile
 D:\Other\Coding\Salah Times\Salah Times\obj\Debug\Salah Ti.F076B338.Up2Date
 D:\Other\Coding\Salah Times\Salah Times\obj\Debug\Salah Times.exe
 D:\Other\Coding\Salah Times\Salah Times\obj\Debug\Salah Times.pdb
+D:\Other\Coding\Salah Times\Salah Times\bin\Debug\takvimi.sqlite

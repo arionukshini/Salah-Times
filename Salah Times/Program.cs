@@ -85,6 +85,7 @@ namespace Salah_Times
 
                                     // Calculate the duration between the two times
                                     TimeSpan nightDuration = nightEnd - nightStart;
+                                    DateTime midnightTime = nightStart.Add(TimeSpan.FromTicks(nightDuration.Ticks / 2));
 
                                     // Calculate one-third and two-thirds of the night duration
                                     TimeSpan oneThird = TimeSpan.FromTicks(nightDuration.Ticks / 3);
@@ -97,10 +98,12 @@ namespace Salah_Times
                                     // Format the times as needed
                                     string oneThirdString = oneThirdTime.ToString("HH:mm");
                                     string twoThirdsString = twoThirdsTime.ToString("HH:mm");
+                                    string midnightString = midnightTime.ToString("HH:mm");
 
                                     // Update the text fields
                                     homeForm.SetClock8Text(oneThirdString);
                                     homeForm.SetClock9Text(twoThirdsString);
+                                    homeForm.SetClock10Text(midnightString);
 
                                     Application.Run(homeForm);
                                 }

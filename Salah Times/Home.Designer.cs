@@ -374,7 +374,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(18)))), ((int)(((byte)(18)))), ((int)(((byte)(18)))));
-            this.ClientSize = new System.Drawing.Size(920, 600);
+            this.ClientSize = new System.Drawing.Size(860, 580);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.timeDiffTxt);
             this.Controls.Add(this.label1);
@@ -384,8 +384,8 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
             this.MinimizeBox = true;
-            this.MaximumSize = new System.Drawing.Size(936, 639);
-            this.MinimumSize = new System.Drawing.Size(936, 639);
+            this.MaximumSize = new System.Drawing.Size(876, 619);
+            this.MinimumSize = new System.Drawing.Size(876, 619);
             this.Name = "Home";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Home";

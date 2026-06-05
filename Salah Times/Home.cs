@@ -14,7 +14,7 @@ namespace Salah_Times
         private static readonly Color SoftBlue = Color.FromArgb(104, 188, 255);
         private static readonly Color MainText = Color.White;
         private static readonly Color MutedText = Color.FromArgb(170, 186, 205);
-        private const int FocusedContentWidth = 720;
+        private const int FocusedContentWidth = 680;
         private const int FocusedContentHeight = 500;
         private const int MaxPageHeight = 330;
         private const int DesiredRowHeight = 52;
@@ -56,7 +56,8 @@ namespace Salah_Times
             FormBorderStyle = FormBorderStyle.FixedSingle;
             MaximizeBox = false;
             MinimizeBox = true;
-            ClientSize = new Size(920, 600);
+            StartPosition = FormStartPosition.CenterScreen;
+            ClientSize = new Size(860, 580);
             MinimumSize = Size;
             MaximumSize = Size;
 
@@ -348,6 +349,12 @@ namespace Salah_Times
             }
 
             base.OnPaint(e);
+        }
+
+        protected override void OnShown(EventArgs e)
+        {
+            base.OnShown(e);
+            CenterToScreen();
         }
 
         private void Timer_Tick(object sender, EventArgs e)

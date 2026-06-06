@@ -3,5 +3,9 @@
   <Profiles>
     <Profile Name="(Default)" />
   </Profiles>
-  <Settings />
+  <Settings>
+    <Setting Name="SelectedCity" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Prishtina</Value>
+    </Setting>
+  </Settings>
 </SettingsFile>

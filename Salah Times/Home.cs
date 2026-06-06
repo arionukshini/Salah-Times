@@ -1,6 +1,7 @@
 using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace Salah_Times
@@ -23,6 +24,9 @@ namespace Salah_Times
         private Timer timer;
         private DateTime nextPrayerTime;
         private Label countdownLabel;
+        private Label cityLabel;
+        private CitySelectButton cityButton;
+        private ContextMenuStrip cityMenu;
         private Panel tabSwitchPanel;
         private TabSwitchButton namaziTabButton;
         private TabSwitchButton extraTabButton;
@@ -30,6 +34,7 @@ namespace Salah_Times
         private Panel extraPage;
         private Label time10;
         public Label clock10;
+        public event Action<string> CityChanged;
 
         // Constructor with prayer times passed in
         public Home(DateTime fajr, DateTime dhuhr, DateTime asr, DateTime maghrib, DateTime isha)
@@ -82,11 +87,38 @@ namespace Salah_Times
             Controls.Add(countdownLabel);
 
             label1.Visible = false;
-            timeDiffTxt.Font = new Font("Segoe UI", 8.7F, FontStyle.Regular, GraphicsUnit.Point);
-            timeDiffTxt.ForeColor = MutedText;
-            timeDiffTxt.BackColor = Color.Transparent;
-            timeDiffTxt.AutoSize = false;
-            timeDiffTxt.UseMnemonic = false;
+            timeDiffTxt.Visible = false;
+
+            cityLabel = new Label
+            {
+                AutoSize = false,
+                BackColor = Color.Transparent,
+                ForeColor = MutedText,
+                Font = new Font("Segoe UI Semibold", 10F, FontStyle.Bold, GraphicsUnit.Point),
+                Text = "Qyteti",
+                TextAlign = ContentAlignment.MiddleRight
+            };
+
+            cityMenu = new ContextMenuStrip
+            {
+                BackColor = Color.FromArgb(17, 26, 40),
+                Font = new Font("Segoe UI Semibold", 9.5F, FontStyle.Bold, GraphicsUnit.Point),
+                ForeColor = MainText,
+                ShowImageMargin = false
+            };
+            cityMenu.Opening += (sender, args) => cityButton.IsMenuOpen = true;
+            cityMenu.Closed += (sender, args) => cityButton.IsMenuOpen = false;
+
+            cityButton = new CitySelectButton
+            {
+                AccentColor = AccentBlue,
+                BackColor = BackgroundColor,
+                Font = new Font("Segoe UI Semibold", 10F, FontStyle.Bold, GraphicsUnit.Point),
+                Text = "Prishtina"
+            };
+            cityButton.Click += (sender, args) => cityMenu.Show(cityButton, new Point(0, cityButton.Height + 4));
+            Controls.Add(cityLabel);
+            Controls.Add(cityButton);
 
             PrepareCustomTabs();
 
@@ -231,7 +263,7 @@ namespace Salah_Times
             LayoutTabSwitcher();
 
             int pageTop = tabSwitchPanel.Bottom + 14;
-            int footerHeight = 44;
+            int footerHeight = 36;
             int footerTop = top + contentHeight - footerHeight;
             int availablePageHeight = Math.Max(248, footerTop - pageTop - 14);
             int pageHeight = Math.Min(MaxPageHeight, availablePageHeight);
@@ -239,8 +271,12 @@ namespace Salah_Times
             normalPage.Bounds = pageBounds;
             extraPage.Bounds = pageBounds;
 
-            timeDiffTxt.Location = new Point(left, footerTop);
-            timeDiffTxt.Size = new Size(contentWidth, footerHeight);
+            int selectorWidth = 250;
+            int selectorLeft = left + (contentWidth - selectorWidth) / 2;
+            cityLabel.Location = new Point(selectorLeft, footerTop + 2);
+            cityLabel.Size = new Size(68, 28);
+            cityButton.Location = new Point(selectorLeft + 78, footerTop);
+            cityButton.Size = new Size(selectorWidth - 78, 32);
 
             LayoutPrayerRows(normalPage);
             LayoutPrayerRows(extraPage);
@@ -310,6 +346,60 @@ namespace Salah_Times
             }
 
             LayoutPrayerRows(selectedPage);
+        }
+
+        public void ConfigureCities(string[] cities, string selectedCity)
+        {
+            cityMenu.Items.Clear();
+
+            if (!cities.Contains(selectedCity))
+            {
+                selectedCity = cities.FirstOrDefault() ?? string.Empty;
+            }
+
+            foreach (string city in cities)
+            {
+                ToolStripMenuItem item = new ToolStripMenuItem(city)
+                {
+                    Checked = city == selectedCity,
+                    CheckOnClick = false,
+                    ForeColor = MainText,
+                    BackColor = Color.FromArgb(17, 26, 40),
+                    Padding = new Padding(12, 4, 12, 4),
+                    Tag = city
+                };
+                item.Click += CityMenuItem_Click;
+                cityMenu.Items.Add(item);
+            }
+
+            cityButton.Text = selectedCity;
+            cityButton.IsMenuOpen = false;
+        }
+
+        private void CityMenuItem_Click(object sender, EventArgs e)
+        {
+            ToolStripMenuItem item = sender as ToolStripMenuItem;
+            string city = item?.Tag as string;
+
+            if (string.IsNullOrEmpty(city))
+            {
+                return;
+            }
+
+            foreach (ToolStripMenuItem menuItem in cityMenu.Items)
+            {
+                menuItem.Checked = (string)menuItem.Tag == city;
+            }
+
+            cityButton.Text = city;
+            cityButton.IsMenuOpen = false;
+            CityChanged?.Invoke(city);
+        }
+
+        public void UpdatePrayerTimes(DateTime fajr, DateTime dhuhr, DateTime asr, DateTime maghrib, DateTime isha)
+        {
+            SetNextPrayerTime(fajr, dhuhr, asr, maghrib, isha);
+            Timer_Tick(this, EventArgs.Empty);
         }
 
         private void TabControl1_DrawItem(object sender, DrawItemEventArgs e)
@@ -592,6 +682,102 @@ namespace Salah_Times
                 TextFormatFlags.HorizontalCenter |
                 TextFormatFlags.VerticalCenter |
                 TextFormatFlags.EndEllipsis);
+        }
+    }
+
+    internal class CitySelectButton : Button
+    {
+        private bool isHovered;
+        private bool isMenuOpen;
+
+        public Color AccentColor { get; set; }
+
+        public bool IsMenuOpen
+        {
+            get { return isMenuOpen; }
+            set
+            {
+                isMenuOpen = value;
+                Invalidate();
+            }
+        }
+
+        public CitySelectButton()
+        {
+            SetStyle(
+                ControlStyles.AllPaintingInWmPaint |
+                ControlStyles.OptimizedDoubleBuffer |
+                ControlStyles.ResizeRedraw |
+                ControlStyles.UserPaint,
+                true);
+
+            AccentColor = Color.FromArgb(15, 135, 241);
+            Cursor = Cursors.Hand;
+            FlatStyle = FlatStyle.Flat;
+            FlatAppearance.BorderSize = 0;
+            ForeColor = Color.White;
+            TabStop = false;
+            UseVisualStyleBackColor = false;
+        }
+
+        protected override void OnMouseEnter(EventArgs e)
+        {
+            isHovered = true;
+            Invalidate();
+            base.OnMouseEnter(e);
+        }
+
+        protected override void OnMouseLeave(EventArgs e)
+        {
+            isHovered = false;
+            Invalidate();
+            base.OnMouseLeave(e);
+        }
+
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
+            e.Graphics.Clear(BackColor);
+
+            Rectangle bounds = new Rectangle(0, 0, Width - 1, Height - 1);
+            Color fill = IsMenuOpen
+                ? Color.FromArgb(24, 43, 65)
+                : (isHovered ? Color.FromArgb(21, 34, 52) : Color.FromArgb(17, 26, 40));
+            Color borderColor = IsMenuOpen
+                ? Color.FromArgb(180, 104, 188, 255)
+                : Color.FromArgb(70, 104, 188, 255);
+
+            using (GraphicsPath path = RoundedPanel.GetRoundedPath(bounds, 12))
+            using (SolidBrush brush = new SolidBrush(fill))
+            using (Pen border = new Pen(borderColor))
+            {
+                e.Graphics.FillPath(brush, path);
+                e.Graphics.DrawPath(border, path);
+            }
+
+            Rectangle textBounds = new Rectangle(14, 0, Width - 42, Height);
+            TextRenderer.DrawText(
+                e.Graphics,
+                Text,
+                Font,
+                textBounds,
+                Color.FromArgb(226, 238, 250),
+                TextFormatFlags.Left |
+                TextFormatFlags.VerticalCenter |
+                TextFormatFlags.EndEllipsis);
+
+            int centerY = Height / 2;
+            Point[] chevron =
+            {
+                new Point(Width - 26, centerY - 3),
+                new Point(Width - 20, centerY + 3),
+                new Point(Width - 14, centerY - 3)
+            };
+
+            using (Pen pen = new Pen(IsMenuOpen ? AccentColor : Color.FromArgb(190, 207, 226), 2))
+            {
+                e.Graphics.DrawLines(pen, chevron);
+            }
         }
     }
 }

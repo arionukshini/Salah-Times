@@ -22,5 +22,17 @@ namespace Salah_Times.Properties {
                 return defaultInstance;
             }
         }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Prishtina")]
+        public string SelectedCity {
+            get {
+                return ((string)(this["SelectedCity"]));
+            }
+            set {
+                this["SelectedCity"] = value;
+            }
+        }
     }
 }

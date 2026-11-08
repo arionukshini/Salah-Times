@@ -1,0 +1,26 @@
+name: iOS test IPA
+
+on:
+  push:
+    branches:
+      - codex/ios-test-ipa
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build iPhone app without signing
+        run: |
+          xcodebuild -project ios/SalahTimes.xcodeproj -scheme SalahTimes -configuration Release -sdk iphoneos -derivedDataPath "$RUNNER_TEMP/DerivedData" CODE_SIGNING_ALLOWED=NO build
+      - name: Package unsigned IPA
+        run: |
+          mkdir -p "$RUNNER_TEMP/Payload"
+          cp -R "$RUNNER_TEMP/DerivedData/Build/Products/Release-iphoneos/SalahTimes.app" "$RUNNER_TEMP/Payload/"
+          cd "$RUNNER_TEMP"
+          zip -qr "$GITHUB_WORKSPACE/SalahTimes-unsigned.ipa" Payload
+      - uses: actions/upload-artifact@v4
+        with:
+          name: SalahTimes-unsigned-ipa
+          path: SalahTimes-unsigned.ipa

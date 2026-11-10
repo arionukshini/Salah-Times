@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Globalization;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -26,6 +28,8 @@ namespace Salah_Times
         private Label countdownLabel;
         private Label cityLabel;
         private CitySelectButton cityButton;
+        private Button cityOffsetHelpButton;
+        private KeyValuePair<string, int>[] cityAdjustments = new KeyValuePair<string, int>[0];
         private ContextMenuStrip cityMenu;
         private Panel tabSwitchPanel;
         private TabSwitchButton namaziTabButton;
@@ -88,6 +92,43 @@ namespace Salah_Times
 
             label1.Visible = false;
             timeDiffTxt.Visible = false;
+
+            cityOffsetHelpButton = new Button
+            {
+                Name = "cityOffsetHelpButton",
+                Text = "?",
+                AccessibleName = "Dallimet e qyteteve",
+                AccessibleDescription = "Shfaq ndryshimin në minuta për çdo qytet.",
+                BackColor = BackgroundColor,
+                ForeColor = MutedText,
+                FlatStyle = FlatStyle.Flat,
+                Font = new Font("Segoe UI", 13F, FontStyle.Bold, GraphicsUnit.Point),
+                Cursor = Cursors.Hand,
+                Enabled = false,
+                UseVisualStyleBackColor = false
+            };
+            cityOffsetHelpButton.FlatAppearance.BorderSize = 0;
+            cityOffsetHelpButton.FlatAppearance.MouseOverBackColor = BackgroundColor;
+            cityOffsetHelpButton.FlatAppearance.MouseDownBackColor = BackgroundColor;
+            cityOffsetHelpButton.Paint += (sender, args) =>
+            {
+                args.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
+                using (Pen circle = new Pen(cityOffsetHelpButton.ForeColor, 1.5F))
+                {
+                    args.Graphics.DrawEllipse(circle, 2, 2,
+                        cityOffsetHelpButton.Width - 5, cityOffsetHelpButton.Height - 5);
+                }
+            };
+            cityOffsetHelpButton.MouseEnter += (sender, args) => cityOffsetHelpButton.ForeColor = SoftBlue;
+            cityOffsetHelpButton.MouseLeave += (sender, args) => cityOffsetHelpButton.ForeColor = MutedText;
+            cityOffsetHelpButton.Click += (sender, args) =>
+            {
+                using (Form dialog = CreateCityOffsetsDialog())
+                {
+                    dialog.ShowDialog(this);
+                }
+            };
+            Controls.Add(cityOffsetHelpButton);
 
             cityLabel = new Label
             {
@@ -242,6 +283,8 @@ namespace Salah_Times
 
         private void LayoutHome()
         {
+            cityOffsetHelpButton.Bounds = new Rectangle(24, 24, 34, 34);
+
             int contentWidth = Math.Max(320, Math.Min(FocusedContentWidth, ClientSize.Width - 80));
             int contentHeight = Math.Max(430, Math.Min(FocusedContentHeight, ClientSize.Height - 54));
             int left = (ClientSize.Width - contentWidth) / 2;
@@ -348,9 +391,11 @@ namespace Salah_Times
             LayoutPrayerRows(selectedPage);
         }
 
-        public void ConfigureCities(string[] cities, string selectedCity)
+        public void ConfigureCities(string[] cities, string selectedCity, IReadOnlyDictionary<string, int> offsets)
         {
             cityMenu.Items.Clear();
+            cityAdjustments = cities.Select(city => new KeyValuePair<string, int>(city, offsets[city])).ToArray();
+            cityOffsetHelpButton.Enabled = cityAdjustments.Length > 0;
 
             if (!cities.Contains(selectedCity))
             {
@@ -374,6 +419,99 @@ namespace Salah_Times
 
             cityButton.Text = selectedCity;
             cityButton.IsMenuOpen = false;
+        }
+
+        private Form CreateCityOffsetsDialog()
+        {
+            Form dialog = new Form
+            {
+                Name = "cityOffsetsDialog",
+                Text = "Dallimet e qyteteve",
+                BackColor = BackgroundColor,
+                ForeColor = MainText,
+                Font = new Font("Segoe UI", 10F, FontStyle.Regular, GraphicsUnit.Point),
+                AutoScaleMode = AutoScaleMode.Font,
+                ClientSize = new Size(390, 448),
+                FormBorderStyle = FormBorderStyle.FixedDialog,
+                StartPosition = FormStartPosition.CenterParent,
+                MaximizeBox = false,
+                MinimizeBox = false,
+                ShowInTaskbar = false
+            };
+            Label heading = new Label
+            {
+                Text = "Dallimet e qyteteve",
+                Font = new Font("Segoe UI Semibold", 15F, FontStyle.Bold, GraphicsUnit.Point)
+            };
+            heading.Bounds = new Rectangle(24, 20, 342,
+                TextRenderer.MeasureText(heading.Text, heading.Font).Height + 4);
+            dialog.Controls.Add(heading);
+            Label explanation = new Label
+            {
+                Text = "Minuta ndaj orarit bazë të Takvimit.\r\nI njëjti ndryshim = i njëjti orar.",
+                ForeColor = MutedText,
+                Font = dialog.Font
+            };
+            int explanationHeight = TextRenderer.MeasureText(explanation.Text, explanation.Font,
+                new Size(342, int.MaxValue), TextFormatFlags.WordBreak).Height + 4;
+            explanation.Bounds = new Rectangle(24, heading.Bottom + 10, 342, explanationHeight);
+            dialog.Controls.Add(explanation);
+
+            int rowHeight = Math.Max(32, TextRenderer.MeasureText("Prishtina", dialog.Font).Height + 8);
+            int tableHeight = cityAdjustments.Length * rowHeight + 8;
+            TableLayoutPanel table = new TableLayoutPanel
+            {
+                BackColor = PanelColor,
+                Bounds = new Rectangle(24, explanation.Bottom + 12, 342, tableHeight),
+                Padding = new Padding(12, 4, 12, 4),
+                ColumnCount = 2,
+                RowCount = cityAdjustments.Length
+            };
+            table.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            table.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute,
+                Math.Max(90, TextRenderer.MeasureText("+2 min", dialog.Font).Width + 12)));
+            for (int row = 0; row < cityAdjustments.Length; row++)
+            {
+                KeyValuePair<string, int> adjustment = cityAdjustments[row];
+                table.RowStyles.Add(new RowStyle(SizeType.Absolute, rowHeight));
+                table.Controls.Add(new Label
+                {
+                    Text = adjustment.Key,
+                    ForeColor = MainText,
+                    Dock = DockStyle.Fill,
+                    TextAlign = ContentAlignment.MiddleLeft
+                }, 0, row);
+                table.Controls.Add(new Label
+                {
+                    Text = adjustment.Value.ToString("+0;-0;0", CultureInfo.InvariantCulture) + " min",
+                    ForeColor = SoftBlue,
+                    Dock = DockStyle.Fill,
+                    TextAlign = ContentAlignment.MiddleRight
+                }, 1, row);
+            }
+            dialog.Controls.Add(table);
+            Label source = new Label
+            {
+                Text = "Burimi: Takvimi 2026, fq. 6.",
+                ForeColor = MutedText,
+                Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point)
+            };
+            source.Bounds = new Rectangle(24, table.Bottom + 10, 342,
+                Math.Max(28, TextRenderer.MeasureText(source.Text, source.Font).Height + 4));
+            dialog.Controls.Add(source);
+            Button closeButton = new TabSwitchButton
+            {
+                Text = "Mbyll",
+                TabStop = true,
+                DialogResult = DialogResult.OK,
+                Bounds = new Rectangle(266, source.Bottom + 8, 100,
+                    Math.Max(32, dialog.Font.Height + 12))
+            };
+            dialog.Controls.Add(closeButton);
+            dialog.AcceptButton = closeButton;
+            dialog.CancelButton = closeButton;
+            dialog.ClientSize = new Size(390, closeButton.Bottom + 24);
+            return dialog;
         }
 
         private void CityMenuItem_Click(object sender, EventArgs e)

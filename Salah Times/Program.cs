@@ -64,7 +64,7 @@ namespace Salah_Times
                             {
                                 while (reader.Read())
                                 {
-                                    DateTime baseFajrTime = DateTime.Parse(reader["imsaku"].ToString()).AddMinutes(18);
+                                    DateTime baseFajrTime = DateTime.Parse(reader["imsaku"].ToString()).AddMinutes(20);
                                     DateTime baseDhuhrTime = DateTime.Parse(reader["dreka"].ToString());
                                     DateTime baseAsrTime = DateTime.Parse(reader["ikindia"].ToString());
                                     DateTime baseMaghribTime = DateTime.Parse(reader["akshami"].ToString());
@@ -84,7 +84,7 @@ namespace Salah_Times
                                     DateTime initialIshaTime = ApplyCityOffset(baseIshaTime, selectedCity);
 
                                     Home homeForm = new Home(initialFajrTime, initialDhuhrTime, initialAsrTime, initialMaghribTime, initialIshaTime);
-                                    homeForm.ConfigureCities(CityOrder, selectedCity);
+                                    homeForm.ConfigureCities(CityOrder, selectedCity, CityOffsets);
 
                                     void UpdateTimesForCity(string city)
                                     {
